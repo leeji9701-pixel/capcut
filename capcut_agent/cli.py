@@ -1,9 +1,10 @@
-"""CLI 진입점. 1단계(UI 없음)용 - 무음 제거 점프컷 드래프트만 생성한다.
+"""CLI 진입점.
 
 사용 예:
     python -m capcut_agent.cli doctor
     python -m capcut_agent.cli doctor --drafts-dir "/path/to/CapCut Drafts"
     python -m capcut_agent.cli jumpcut input.mp4 --drafts-dir "/path/to/CapCut Drafts" --name my_draft
+    python -m capcut_agent.cli serve
 """
 
 import argparse
@@ -47,6 +48,13 @@ def _cmd_jumpcut(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_serve(args: argparse.Namespace) -> int:
+    import uvicorn
+
+    uvicorn.run("capcut_agent.web.app:app", host=args.host, port=args.port, reload=False)
+    return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="capcut_agent")
     parser.add_argument("--drafts-dir", help="CapCut 드래프트 폴더 경로 (미지정 시 OS별 기본 경로 추정)")
@@ -66,6 +74,11 @@ def main(argv=None) -> int:
         help="동일 이름 드래프트가 있어도 덮어쓰지 않음 (기본은 덮어씀)",
     )
     jumpcut_p.set_defaults(func=_cmd_jumpcut, allow_replace=True)
+
+    serve_p = sub.add_parser("serve", help="로컬 웹 UI 실행 (드래그앤드롭 + 진행 상황 표시)")
+    serve_p.add_argument("--host", default="127.0.0.1")
+    serve_p.add_argument("--port", type=int, default=8000)
+    serve_p.set_defaults(func=_cmd_serve)
 
     args = parser.parse_args(argv)
     return args.func(args)

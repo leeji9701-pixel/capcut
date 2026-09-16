@@ -1,1 +1,8 @@
 pycapcut>=0.0.3
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+
+# ASR 백엔드: Mac(Apple Silicon)에서는 mlx-whisper, 그 외에서는 faster-whisper.
+# 두 패키지 모두 명시하면 mlx-whisper가 Apple Silicon 전용이라 다른 플랫폼에서
+# pip install이 실패하므로, requirements-mac.txt / requirements-other.txt로 나눈다.
