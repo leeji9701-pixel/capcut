@@ -1,0 +1,29 @@
+name: 인스타360 정리기 exe 빌드
+
+on:
+  push:
+    paths:
+      - "insta360_flatten/**"
+      - "run_insta360_flatten.py"
+      - ".github/workflows/build-insta360-exe.yml"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 의존성 설치
+        run: pip install pyinstaller tkinterdnd2
+      - name: exe 빌드
+        shell: bash
+        run: >
+          pyinstaller --onefile --windowed --name "인스타360정리기"
+          --collect-all tkinterdnd2 run_insta360_flatten.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 인스타360정리기-windows
+          path: dist/*.exe
